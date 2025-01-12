@@ -13,6 +13,7 @@ import {
 import {
   sendSMTPEmail
 } from '@/app/lib/email'
+import getLogger from '@/app/lib/logger'
 
 export async function authenticate (
   prevState: string | undefined,
@@ -142,7 +143,6 @@ export async function addEmailAccount (prevState: AddEmailAccountState, formData
   })
 
   if (!validatedFields.success) {
-    console.log(validatedFields.error.flatten().fieldErrors)
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Invalid request. Failed to add email account',
@@ -192,14 +192,14 @@ export type TestEmailAccountState = {
 }
 
 export async function testEmailAccount (prevState: TestEmailAccountState, formData: FormData): Promise<TestEmailAccountState>{
+  const logger = await getLogger()
+
   const validatedFields = TestEmailAccountFormSchema.safeParse({
     uuid: formData.get('uuid'),
     email: formData.get('email')
   })
 
-  console.log(`prevState ${JSON.stringify(prevState)}`)
   if (!validatedFields.success) {
-    console.log(validatedFields.error.flatten().fieldErrors)
     return {
       email: formData.get('email')?.toString() || '',
       errors: validatedFields.error.flatten().fieldErrors,
@@ -210,12 +210,14 @@ export async function testEmailAccount (prevState: TestEmailAccountState, formDa
   const { uuid, email } = validatedFields.data
 
   try {
+    logger.info(`sending test email to ${email}`)
     await sendSMTPEmail(uuid, email, 'Test from VBC Toolkit', 'This is a test email from VBC Toolkit')
     return {
       email: formData.get('email')?.toString() || '',
       message: `Test email sent`
     }
   } catch (error) {
+    logger.error(`failed to send test email: ${error}`)
     return {
       email: formData.get('email')?.toString() || '',
       errors: {},

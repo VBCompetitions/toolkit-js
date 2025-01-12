@@ -4,12 +4,8 @@ import { notFound } from 'next/navigation'
 import { getCompetitionByUUID } from '@/app/lib/database'
 import {
   Box,
-  FormControl,
   FormControlLabel,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
+  // SelectChangeEvent,
   Switch
 } from '@mui/material'
 import { EmailAccount } from '@/app/lib/definitions'
@@ -27,9 +23,9 @@ export default async function Email (
     notFound()
   }
 
-  function changeAccount (e: SelectChangeEvent<string>) {
-    // setAccount(emailAccounts.find(el => el.name === e.target.value))
-  }
+  // function changeAccount (e: SelectChangeEvent<string>) {
+  //   // setAccount(emailAccounts.find(el => el.name === e.target.value))
+  // }
 
   return (
     <>

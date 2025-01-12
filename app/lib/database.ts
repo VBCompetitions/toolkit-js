@@ -29,7 +29,7 @@ async function releaseClient (client: Database|undefined) {
 }
 
 export async function createUser (config: CreateUserConfig) {
-  const logger = getLogger()
+  const logger = await getLogger()
 
   let client
   try {
@@ -46,7 +46,7 @@ export async function createUser (config: CreateUserConfig) {
 }
 
 export async function updateUser (config: UpdateUserConfig) {
-  const logger = getLogger()
+  const logger = await getLogger()
 
   let client
   try {
@@ -128,7 +128,7 @@ export async function getUsers () {
 }
 
 export async function createCompetition (config: CreateCompetitionConfig) {
-  const logger = getLogger()
+  const logger = await getLogger()
 
   let client
   try {
@@ -157,7 +157,7 @@ export async function getCompetitions () : Promise<Array<Competition>> {
 }
 
 export async function getCompetitionByUUID (uuid: string) : Promise<Competition> {
-  const logger = getLogger()
+  const logger = await getLogger()
   logger.debug(`Getting competition with UUID=[${uuid}]`)
 
   let client
@@ -181,7 +181,7 @@ export async function getCompetitionByUUID (uuid: string) : Promise<Competition>
 }
 
 export async function createEmailAccount (config: EmailAccount) {
-  const logger = getLogger()
+  const logger = await getLogger()
 
   let client
   try {
@@ -210,7 +210,7 @@ export async function getEmailAccounts () : Promise<Array<EmailAccount>> {
 }
 
 export async function getEmailAccountByUUID (uuid: string) : Promise<EmailAccount> {
-  const logger = getLogger()
+  const logger = await getLogger()
   logger.debug(`Getting email account with UUID=[${uuid}]`)
 
   let client

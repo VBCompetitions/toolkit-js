@@ -8,7 +8,7 @@ import { SMTPEmailConfigSchema } from '@/app/lib/definitions'
 import SMTPConnection from 'nodemailer/lib/smtp-transport'
 
 export async function sendSMTPEmail (uuid: string, to: string, subject: string, body: string) {
-  const logger = getLogger()
+  const logger = await getLogger()
   logger.info(`Sending email to [${to}] using account with UUID=[${uuid}]`)
 
   let emailAccount

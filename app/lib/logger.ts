@@ -1,10 +1,11 @@
-import path from 'node:path'
+'use server'
+
 import { pino, Logger } from 'pino'
 import type { LogLevel } from '@/app/lib/definitions'
 
 let logger: Logger
 
-export default function getLogger () {
+export default async function getLogger () {
   if (!process.env.LOG_PATH) {
     throw new Error('configuration value LOG_PATH not set')
   }
@@ -16,7 +17,7 @@ export default function getLogger () {
       pino.transport({
         target: 'pino-roll',
         options: {
-          file: path.join(process.env.LOG_PATH, 'log'),
+          file: `${process.env.LOG_PATH}/log`,
           frequency: 'daily',
           limit: {
             count: 60
@@ -29,7 +30,7 @@ export default function getLogger () {
   return logger
 }
 
-export function level (level: LogLevel) {
+export async function level (level: LogLevel) {
   if (logger) {
     logger.level = level
   }
