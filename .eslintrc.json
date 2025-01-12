@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "files": ["cli.js"],
+      "rules": {
+        "no-unused-vars": ["error", {
+          "caughtErrors": "none"
+        }]
+      }
+    }
+  ],
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ]
+}
