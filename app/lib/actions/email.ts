@@ -40,71 +40,6 @@ export async function logout () {
   await signOut()
 }
 
-const AddCompetitionFormSchema = z.object({
-  type: z.enum(['url', 'local']),
-  url: z.string().url({ message: 'Please enter a valid URL' }),
-  apiKey: z.string()
-})
-
-export type AddCompetitionState = {
-  errors?: {
-    type?: string[]
-    url?: string[]
-    apiKey?: string[]
-  }
-  message?: string | null
-}
-
-export async function addCompetition (prevState: AddCompetitionState, formData: FormData): Promise<AddCompetitionState>{
-  const validatedFields = AddCompetitionFormSchema.safeParse({
-    type: formData.get('type'),
-    url: formData.get('url'),
-    apiKey: formData.get('apiKey')
-  })
-
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Invalid request. Failed to add competition',
-    }
-  }
-
-  const { type, url, apiKey } = validatedFields.data
-
-  if (type === 'url') {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        authorization: `Bearer APIKeyV1 ${apiKey}`
-      }
-    })
-    const competitionJSON = await response.json()
-
-    const data = { url, apiKey }
-
-    try {
-      createCompetition({
-        uuid: uuidv4(),
-        name: competitionJSON.name,
-        type: 'url',
-        data: JSON.stringify(data)
-      })
-    } catch (err) {
-      return {
-        message: `Database Error: Failed to add competition: ${err}`
-      }
-    } finally {
-      revalidatePath('/c')
-      redirect('/c')
-    }
-
-  } else {
-    return {
-      message: `Not yet supported`
-    }
-  }
-}
-
 const AddEmailAccountFormSchema = z.object({
   accountName: z.string().min(1).max(100),
   email: z.string().email(),
@@ -158,7 +93,7 @@ export async function addEmailAccount (prevState: AddEmailAccountState, formData
         uuid: uuidv4(),
         name: accountName,
         email,
-        lastUse: '0',
+        lastUse: 0,
         type,
         data: JSON.stringify(data)
       })
@@ -256,7 +191,7 @@ export async function updateEmailAccount (prevState: UpdateEmailAccountState, fo
         name: accountName,
         email,
         type,
-        lastUse: '0',
+        lastUse: 0,
         data: JSON.stringify(data)
       })
     } catch (err) {
