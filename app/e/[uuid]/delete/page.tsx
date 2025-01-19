@@ -1,10 +1,11 @@
 import { Metadata } from 'next'
 import { getEmailAccountByUUID } from '@/app/lib/database'
 import { notFound } from 'next/navigation'
-import Heading from '@/app/ui/heading'
-import { Suspense } from 'react'
-import CompetitionSkeleton from '@/app/ui/competitions/skeleton'
 import ViewAccount from '@/app/ui/emailAccounts/view'
+import Heading from '@/app/ui/heading'
+import {
+  Box
+} from '@mui/material'
 
 export default async function Page(props: { params: Promise<{ uuid: string }> }) {
   const params = await props.params;
@@ -16,13 +17,17 @@ export default async function Page(props: { params: Promise<{ uuid: string }> })
   }
 
   return (
-    <Suspense fallback={<CompetitionSkeleton />}>
-      <Heading heading={emailAccount.name} />
-      <ViewAccount emailAccount={emailAccount} />
-    </Suspense>
+    <Box className='mb-3'>
+      <Box className='p-4 md:overflow-y-auto md:p-3'>
+        <Heading heading={'Delete Email Account?'} />
+      </Box>
+      <Box className='flex grow text-left'></Box>
+        <ViewAccount emailAccount={emailAccount} />
+      <Box className='flex grow-[2]'></Box>
+    </Box>
   )
 }
 
 export const metadata: Metadata = {
-  title: 'Email Account',
+  title: 'Delete Email Account?',
 }

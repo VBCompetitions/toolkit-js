@@ -195,6 +195,36 @@ export async function createEmailAccount (config: EmailAccount) {
   }
 }
 
+export async function updateEmailAccount (config: EmailAccount) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`updating email account with uuid=["${config.uuid}"]`)
+    await client.run(`UPDATE "emailAccounts" SET name = ?, email = ?, type = ?, data = ? WHERE uuid = ?`, config.name, config.email, config.type, config.data, config.uuid)
+  } catch (error) {
+    throw new Error(`Failed to create competition: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
+}
+
+export async function recordEmailSent (uuid: string) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`Recording time when email sent with uuid=["${uuid}"]`)
+    await client.run(`UPDATE "emailAccounts" SET lastUsed = ? WHERE uuid = ?`, Date.now(), uuid)
+  } catch (error) {
+    throw new Error(`Failed to create competition: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
+}
+
 export async function getEmailAccounts () : Promise<Array<EmailAccount>> {
   let client
   let emailAccounts

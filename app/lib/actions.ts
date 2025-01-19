@@ -8,7 +8,8 @@ import { signIn, signOut } from '@/auth'
 import { AuthError } from 'next-auth'
 import {
   createCompetition,
-  createEmailAccount
+  createEmailAccount,
+  updateEmailAccount as updateEmail
 } from '@/app/lib/database'
 import {
   sendSMTPEmail
@@ -172,6 +173,124 @@ export async function addEmailAccount (prevState: AddEmailAccountState, formData
 
   } else {
     return {
+      message: `Not yet supported`
+    }
+  }
+}
+
+const UpdateEmailAccountFormSchema = z.object({
+  uuid: z.string().uuid(),
+  accountName: z.string().min(1).max(100),
+  email: z.string().email(),
+  type: z.enum(['SMTP']),
+  useTLS: z.enum(['on']).nullable(),
+  hostname: z.string(),
+  port: z.coerce.number().int(),
+  username: z.string(),
+  password: z.string(),
+})
+
+export type UpdateEmailAccountState = {
+  settings: {
+    uuid: string
+    accountName?: string
+    email?: string
+    type?: string
+    useTLS?: boolean
+    hostname?: string
+    port?: string
+    username?: string
+    password?: string
+  },
+  errors?: {
+    accountName?: string[]
+    email?: string[]
+    type?: string[]
+    useTLS?: string[]
+    hostname?: string[]
+    port?: string[]
+    username?: string[]
+    password?: string[]
+  }
+  message?: string | null
+}
+
+export async function updateEmailAccount (prevState: UpdateEmailAccountState, formData: FormData): Promise<UpdateEmailAccountState>{
+  const validatedFields = UpdateEmailAccountFormSchema.safeParse({
+    uuid: formData.get('uuid'),
+    accountName: formData.get('accountName'),
+    email: formData.get('email'),
+    type: formData.get('type'),
+    useTLS: formData.get('useTLS'),
+    apiKey: formData.get('apiKey'),
+    hostname: formData.get('hostname'),
+    port: formData.get('port'),
+    username: formData.get('username'),
+    password: formData.get('password')
+  })
+
+  if (!validatedFields.success) {
+    return {
+      settings: {
+        uuid: formData.get('uuid')?.toString() || '',
+        accountName: formData.get('accountName')?.toString(),
+        email: formData.get('email')?.toString(),
+        type: formData.get('type')?.toString(),
+        useTLS: formData.get('useTLS') === 'on',
+        hostname: formData.get('hostname')?.toString(),
+        port: formData.get('port')?.toString(),
+        username: formData.get('username')?.toString(),
+        password: formData.get('password')?.toString()
+      },
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Invalid request. Failed to update email account',
+    }
+  }
+
+  const { uuid, accountName, email, type, useTLS, hostname, port, username, password } = validatedFields.data
+  if (type === 'SMTP') {
+    const data = { useTLS: useTLS === 'on', hostname, port, username, password }
+    try {
+      updateEmail({
+        uuid,
+        name: accountName,
+        email,
+        type,
+        lastUse: '0',
+        data: JSON.stringify(data)
+      })
+    } catch (err) {
+      return {
+        settings: {
+          uuid,
+          accountName,
+          email,
+          type,
+          useTLS: useTLS === 'on',
+          hostname,
+          port: `${port}`,
+          username,
+          password
+        },
+        message: `Database Error: Failed to update email account: ${err}`
+      }
+    } finally {
+      revalidatePath(`/e/${uuid}/update`)
+      redirect('/e/${uuid}')
+    }
+  } else {
+    return {
+      settings: {
+        uuid: formData.get('uuid')?.toString() || '',
+        accountName: formData.get('accountName')?.toString(),
+        email: formData.get('email')?.toString(),
+        type: formData.get('type')?.toString(),
+        useTLS: formData.get('useTLS') === 'on',
+        hostname: formData.get('hostname')?.toString(),
+        port: formData.get('port')?.toString(),
+        username: formData.get('username')?.toString(),
+        password: formData.get('password')?.toString()
+      },
       message: `Not yet supported`
     }
   }

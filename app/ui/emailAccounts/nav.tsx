@@ -6,6 +6,8 @@ import { usePathname } from 'next/navigation'
 import {
   ArrowBackRounded,
   DashboardRounded,
+  DeleteRounded,
+  EditRounded,
   EmailRounded
 } from '@mui/icons-material'
 
@@ -18,7 +20,9 @@ export default function EmailAddressNav(
   const links = [
     { name: 'Email Accounts', href: `/e`, icon: ArrowBackRounded, pad: true },
     { name: 'Overview', href: `/e/${uuid}`, icon: DashboardRounded },
-    { name: 'Test', href: `/e/${uuid}/test`, icon: EmailRounded }
+    { name: 'Test', href: `/e/${uuid}/test`, icon: EmailRounded },
+    { name: 'Update', href: `/e/${uuid}/update`, icon: EditRounded },
+    { name: 'Delete', href: `/e/${uuid}/delete`, icon: DeleteRounded }
   ]
 
   return (

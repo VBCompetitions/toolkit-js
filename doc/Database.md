@@ -58,10 +58,10 @@ The API Key is sent as an "APIKeyV1" bearer token in the authorization header, i
 `data` contains the following
 ```json
 {
-  "useTLS": "Whether to use TLS immediately (instead of STARTTLS)",
-  "hostname": "The SMTP hostname",
-  "port": "The SMTP Port",
-  "username": "The SMTP Username",
-  "password": "The SMTP Password"
+  "useTLS": "(boolean) Whether to use TLS immediately (instead of STARTTLS)",
+  "hostname": "(string) The SMTP hostname",
+  "port": "(string) The SMTP Port",
+  "username": "(string) The SMTP Username",
+  "password": "(string) The SMTP Password"
 }
 ```
