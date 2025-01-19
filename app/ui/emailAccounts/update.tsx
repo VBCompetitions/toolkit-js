@@ -29,7 +29,7 @@ import {
   VisibilityRounded
 } from '@mui/icons-material'
 
-import { updateEmailAccount, UpdateEmailAccountState } from '@/app/lib/actions'
+import { updateEmailAccount, UpdateEmailAccountState } from '@/app/lib/actions/email'
 import { EmailAccount } from '@/app/lib/definitions'
 
 export default function UpdateAccount (

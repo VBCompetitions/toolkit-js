@@ -17,7 +17,7 @@ import {
 } from '@mui/icons-material'
 
 import { useActionState, useState } from 'react'
-import { authenticate } from '@/app/lib/actions'
+import { authenticate } from '@/app/lib/actions/user'
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)

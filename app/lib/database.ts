@@ -5,7 +5,9 @@ import { open, Database } from 'sqlite'
 import getLogger from '@/app/lib/logger'
 import {
   type EmailAccount,
+  type EmailAccountMetadata,
   type Competition,
+  type CompetitionMetadata,
   type CreateCompetitionConfig,
   type CreateUserConfig,
   type UpdateUserConfig,
@@ -142,12 +144,12 @@ export async function createCompetition (config: CreateCompetitionConfig) {
   }
 }
 
-export async function getCompetitions () : Promise<Array<Competition>> {
+export async function getCompetitions () : Promise<Array<CompetitionMetadata>> {
   let client
   let competitions
   try {
     client = await getClient()
-    competitions = await client.all(`SELECT * FROM "competitions"`)
+    competitions = await client.all(`SELECT uuid, name, type FROM "competitions"`)
   } catch (error) {
     throw new Error(`Failed to get the competitions: ${error}`);
   } finally {
@@ -195,42 +197,12 @@ export async function createEmailAccount (config: EmailAccount) {
   }
 }
 
-export async function updateEmailAccount (config: EmailAccount) {
-  const logger = await getLogger()
-
-  let client
-  try {
-    client = await getClient()
-    logger.info(`updating email account with uuid=["${config.uuid}"]`)
-    await client.run(`UPDATE "emailAccounts" SET name = ?, email = ?, type = ?, data = ? WHERE uuid = ?`, config.name, config.email, config.type, config.data, config.uuid)
-  } catch (error) {
-    throw new Error(`Failed to create competition: ${error}`);
-  } finally {
-    await releaseClient(client)
-  }
-}
-
-export async function recordEmailSent (uuid: string) {
-  const logger = await getLogger()
-
-  let client
-  try {
-    client = await getClient()
-    logger.info(`Recording time when email sent with uuid=["${uuid}"]`)
-    await client.run(`UPDATE "emailAccounts" SET lastUsed = ? WHERE uuid = ?`, Date.now(), uuid)
-  } catch (error) {
-    throw new Error(`Failed to create competition: ${error}`);
-  } finally {
-    await releaseClient(client)
-  }
-}
-
-export async function getEmailAccounts () : Promise<Array<EmailAccount>> {
+export async function getEmailAccounts () : Promise<Array<EmailAccountMetadata>> {
   let client
   let emailAccounts
   try {
     client = await getClient()
-    emailAccounts = await client.all(`SELECT * FROM "emailAccounts"`)
+    emailAccounts = await client.all(`SELECT uuid, name, email, lastUse, type FROM "emailAccounts"`)
   } catch (error) {
     throw new Error(`Failed to get the email accounts: ${error}`);
   } finally {
@@ -261,4 +233,49 @@ export async function getEmailAccountByUUID (uuid: string) : Promise<EmailAccoun
     logger.warn(`No email account found with UUID=${uuid}`)
   }
   return emailAccount
+}
+
+export async function updateEmailAccount (config: EmailAccount) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`updating email account with uuid=["${config.uuid}"]`)
+    await client.run(`UPDATE "emailAccounts" SET name = ?, email = ?, type = ?, data = ? WHERE uuid = ?`, config.name, config.email, config.type, config.data, config.uuid)
+  } catch (error) {
+    throw new Error(`Failed to update email account: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
+}
+
+export async function deleteEmailAccount (uuid: string) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`deleting email account with uuid=["${uuid}"]`)
+    await client.run(`DELETE FROM "emailAccounts" WHERE uuid = ?`, uuid)
+  } catch (error) {
+    throw new Error(`Failed to delete email account: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
+}
+
+export async function recordEmailSent (uuid: string) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`Recording time when email sent with uuid=["${uuid}"]`)
+    await client.run(`UPDATE "emailAccounts" SET lastUse = ? WHERE uuid = ?`, Date.now(), uuid)
+  } catch (error) {
+    throw new Error(`Failed to record email bein sent: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
 }

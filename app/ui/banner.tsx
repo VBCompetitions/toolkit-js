@@ -23,7 +23,7 @@ import {
   SettingsRounded,
   SportsVolleyballRounded
 } from '@mui/icons-material'
-import { logout } from '@/app/lib/actions'
+import { logout } from '@/app/lib/actions/user'
 
 // import packageJson from '../package.json';
 

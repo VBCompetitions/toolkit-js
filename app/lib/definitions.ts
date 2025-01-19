@@ -53,9 +53,24 @@ export type CreateCompetitionConfig = {
   data: string
 }
 
+export type CompetitionMetadata = {
+  uuid: string
+  name: string
+  type: string
+}
+
 export type Competition = {
   uuid: string
   name: string
+  type: string
+  data: string
+}
+
+export type EmailAccountMetadata = {
+  uuid: string
+  name: string
+  email: string
+  lastUse: number
   type: string
 }
 
@@ -63,7 +78,7 @@ export type EmailAccount = {
   uuid: string
   name: string
   email: string
-  lastUse: string
+  lastUse: number
   type: string
   data: string
 }
@@ -71,7 +86,7 @@ export type EmailAccount = {
 export const SMTPEmailConfigSchema = z.object({
   useTLS: z.boolean(),
   hostname: z.string(),
-  port: z.string(),
+  port: z.number().int(),
   username: z.string(),
   password: z.string()
 })

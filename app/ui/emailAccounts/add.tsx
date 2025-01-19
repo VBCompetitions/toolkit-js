@@ -29,7 +29,7 @@ import {
   VisibilityRounded
 } from '@mui/icons-material'
 
-import { addEmailAccount, AddEmailAccountState } from '@/app/lib/actions'
+import { addEmailAccount, AddEmailAccountState } from '@/app/lib/actions/email'
 
 export default function AddAccount () {
   const initialState: AddEmailAccountState = { message: null, errors: {} }

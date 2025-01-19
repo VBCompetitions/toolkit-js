@@ -9,9 +9,9 @@ export default function ViewAccount (
   { emailAccount }:
   { emailAccount: EmailAccount }
 ) {
-  const smtpSettings = JSON.parse(emailAccount.data)
+  const lastUse = emailAccount.lastUse === 0 ? undefined : (new Date(emailAccount.lastUse)).toISOString()
 
-return (
+  return (
     <Box className='flex flex-col'>
       <Box className='m-2'>
         <Box className='mr-2 inline'>
@@ -24,6 +24,18 @@ return (
           <Typography className='text-left text-blue-500' variant='h6' component='span'>Email address:</Typography>
         </Box>
         <Typography className='text-left' variant='body1' component='span'>{emailAccount.email}</Typography>
+      </Box>
+      <Box className='m-2'>
+        <Box className='mr-2 inline'>
+          <Typography className='text-left text-blue-500' variant='h6' component='span'>Last used:</Typography>
+        </Box>
+        {
+          lastUse
+          ?
+          <Typography className='text-left' variant='body1' component='span'>{lastUse}</Typography>
+          :
+          <Typography className='text-left text-gray-400' variant='body1' component='span'>not yet used</Typography>
+        }
       </Box>
     </Box>
   )

@@ -1,7 +1,7 @@
 
 'use client'
 
-import { testEmailAccount, TestEmailAccountState } from '@/app/lib/actions'
+import { testEmailAccount, TestEmailAccountState } from '@/app/lib/actions/email'
 import {
   useActionState
 } from 'react'

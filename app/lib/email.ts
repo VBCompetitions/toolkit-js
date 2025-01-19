@@ -2,7 +2,8 @@ import getLogger from '@/app/lib/logger'
 import nodemailer from 'nodemailer'
 
 import {
-  getEmailAccountByUUID
+  getEmailAccountByUUID,
+  recordEmailSent
 } from '@/app/lib/database'
 import { SMTPEmailConfigSchema } from '@/app/lib/definitions'
 import SMTPConnection from 'nodemailer/lib/smtp-transport'
@@ -38,7 +39,7 @@ export async function sendSMTPEmail (uuid: string, to: string, subject: string, 
 
   const transportConfig = {
     host: validatedFields.data.hostname,
-    port: parseInt(validatedFields.data.port),
+    port: validatedFields.data.port,
     auth: {
       user: validatedFields.data.username,
       pass: validatedFields.data.password
@@ -63,6 +64,12 @@ export async function sendSMTPEmail (uuid: string, to: string, subject: string, 
   } catch (error) {
     logger.error(`Error sending email: ${error}`)
     throw error
+  }
+
+  try {
+    await recordEmailSent(uuid)
+  } catch (error) {
+    logger.error(`Error recording email account being used: ${error}`)
   }
 
   logger.info(`Email sent: from=[${emailAccount.email}] to=[${to}], subject=[${subject}], body=[${body}]`)
