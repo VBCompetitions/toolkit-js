@@ -9,6 +9,12 @@ export type CreateUserConfig = {
   roles: Array<string>
 }
 
+export type CreatePendingUserConfig = {
+  uuid: string
+  username: string
+  roles: Array<string>
+}
+
 export type GetUserConfig = {
   uuid?: string|undefined
   username?: string|undefined
@@ -27,7 +33,7 @@ export type UpdateUserConfig = {
 export type UserRecord = {
   uuid: string
   username: string
-  roles: string
+  roles: Array<string>
   hash: string
   state: 'pending'|'active'|'suspended',
   created: number

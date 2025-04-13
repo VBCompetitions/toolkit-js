@@ -16,7 +16,7 @@ export default async function EmailAccountList () {
   let newAccountButton = null
   // if (Roles.roleCheck(userInfo.roles, Roles.EmailAccount.add)) {
     newAccountButton = (
-      <Box textAlign="left" paddingLeft="10px">
+      <Box className='text-left pl-2 pb-2'>
         <Link href='/e/add'>
           <Button aria-label="Add competition" variant="outlined" startIcon={<AddRounded />} >Add Account</Button>
         </Link>
@@ -27,7 +27,7 @@ export default async function EmailAccountList () {
   return (
     <Box className='p-2 flex flex-col grow'>
       {newAccountButton}
-      <Box padding="10px">
+      <Box className='p-2'>
         <Grid2 container spacing={2}>
           {emailAccountList.sort((a, b) => {
             return a.name.localeCompare(b.name)

@@ -1,25 +1,16 @@
 'use server'
 
-import { z } from 'zod'
-import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
-import { v4 as uuidv4 } from 'uuid'
 import { signIn, signOut } from '@/auth'
 import { AuthError } from 'next-auth'
-import {
-  createCompetition,
-  createEmailAccount,
-  updateEmailAccount as updateEmail
-} from '@/app/lib/database'
-import {
-  sendSMTPEmail
-} from '@/app/lib/email'
 import getLogger from '@/app/lib/logger'
 
 export async function authenticate (
   prevState: string | undefined,
   formData: FormData,
 ) {
+  const logger = await getLogger()
+  logger.info('logging in')
+
   try {
     await signIn('credentials', formData);
   } catch (error) {
@@ -36,6 +27,7 @@ export async function authenticate (
 }
 
 export async function logout () {
-  console.log('logging out in actions')
+  const logger = await getLogger()
+  logger.info('logging out')
   await signOut()
 }

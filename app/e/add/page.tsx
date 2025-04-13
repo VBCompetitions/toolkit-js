@@ -12,8 +12,7 @@ export default function Page() {
         <Heading heading={'Add Email Account'} />
       </Box>
       <Box className='flex flex-col grow justify-center items-center'>
-        <Box className='flex grow'></Box>
-          <AddAccount />
+        <AddAccount />
         <Box className='flex grow-[2]'></Box>
       </Box>
     </Box>

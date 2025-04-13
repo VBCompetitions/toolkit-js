@@ -10,6 +10,7 @@ import {
   type CompetitionMetadata,
   type CreateCompetitionConfig,
   type CreateUserConfig,
+  type CreatePendingUserConfig,
   type UpdateUserConfig,
   type UserRecord
 } from '@/app/lib/definitions'
@@ -47,6 +48,23 @@ export async function createUser (config: CreateUserConfig) {
   }
 }
 
+export async function createPendingUser (config: CreatePendingUserConfig) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.debug(`adding user ${config.username} to table "users"`)
+    const created = Date.now()
+    const lastLogin = 0
+    await client.run(`INSERT INTO "users" VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, config.uuid, config.username, config.roles.join(','), '', 'pending', created, lastLogin, 0)
+  } catch (error) {
+    throw new Error(`Failed to create user: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
+}
+
 export async function updateUser (config: UpdateUserConfig) {
   const logger = await getLogger()
 
@@ -56,27 +74,27 @@ export async function updateUser (config: UpdateUserConfig) {
 
     if (config.username) {
       logger.info(`Changing username for user with UUID ${config.uuid} to ${config.username}`)
-      await client.run(`UPDATE "users" SET username = ? WHERE id = ?`, config.username, config.uuid)
+      await client.run(`UPDATE "users" SET username = ? WHERE uuid = ?`, config.username, config.uuid)
     }
     if (config.hash) {
-      logger.info(`Changing pawssword for user with UUID ${config.uuid}`)
-      await client.run(`UPDATE "users" SET hash = ? WHERE id = ?`, config.hash, config.uuid)
+      logger.info(`Changing password for user with UUID ${config.uuid}`)
+      await client.run(`UPDATE "users" SET hash = ? WHERE uuid = ?`, config.hash, config.uuid)
     }
     if (config.roles) {
       logger.info(`Changing roles for user with UUID ${config.uuid} to ${config.roles.join(',')}`)
-      await client.run(`UPDATE "users" SET roles = ? WHERE id = ?`, config.roles.join(','), config.uuid)
+      await client.run(`UPDATE "users" SET roles = ? WHERE uuid = ?`, config.roles.join(','), config.uuid)
     }
     if (config.state) {
       logger.info(`Changing state for user with UUID ${config.uuid} to ${config.state}`)
-      await client.run(`UPDATE "users" SET state = ? WHERE id = ?`, config.state, config.uuid)
+      await client.run(`UPDATE "users" SET state = ? WHERE uuid = ?`, config.state, config.uuid)
     }
     if (config.lastLogin) {
       logger.info(`Changing lastLogin for user with UUID ${config.uuid} to ${config.lastLogin}`)
-      await client.run(`UPDATE "users" SET lastLogin = ? WHERE id = ?`, config.lastLogin, config.uuid)
+      await client.run(`UPDATE "users" SET lastLogin = ? WHERE uuid = ?`, config.lastLogin, config.uuid)
     }
     if (config.version) {
       logger.info(`Changing version for user with UUID ${config.uuid} to ${config.version}`)
-      await client.run(`UPDATE "users" SET version = ? WHERE id = ?`, config.version, config.uuid)
+      await client.run(`UPDATE "users" SET version = ? WHERE uuid = ?`, config.version, config.uuid)
     }
 
     logger.info(`Changes for user with UUID ${config.uuid} complete`)
@@ -93,6 +111,7 @@ export async function getUserByUsername (username: string) : Promise<UserRecord|
   try {
     client = await getClient()
     user = await client.get(`SELECT * FROM "users" WHERE username = ?`, username)
+    user.roles = user.roles.split(',')
   } catch (error) {
     throw new Error(`Failed to get the requested user: ${error}`);
   } finally {
@@ -107,6 +126,7 @@ export async function getUserByUUID (uuid: string) : Promise<UserRecord> {
   try {
     client = await getClient()
     user = await client.get(`SELECT * FROM "users" WHERE uuid = ?`, uuid)
+    user.roles = user.roles.split(',')
   } catch (error) {
     throw new Error(`Failed to get the requested user: ${error}`);
   } finally {
@@ -115,18 +135,36 @@ export async function getUserByUUID (uuid: string) : Promise<UserRecord> {
   return user
 }
 
-export async function getUsers () {
+export async function getUsers () : Promise<Array<UserRecord>> {
   let client
   let users
   try {
     client = await getClient()
     users = await client.all(`SELECT * FROM "users"`)
+    users.forEach(user => {
+      user.roles = user.roles.split(',')
+    })
   } catch (error) {
     throw new Error(`Failed to get the users: ${error}`);
   } finally {
     await releaseClient(client)
   }
   return users
+}
+
+export async function deleteUser (uuid: string) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`deleting user with uuid=["${uuid}"]`)
+    await client.run(`DELETE FROM "users" WHERE uuid = ?`, uuid)
+  } catch (error) {
+    throw new Error(`Failed to delete user: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
 }
 
 export async function createCompetition (config: CreateCompetitionConfig) {
@@ -180,6 +218,21 @@ export async function getCompetitionByUUID (uuid: string) : Promise<Competition>
     logger.warn(`No competition found with UUID=${uuid}`)
   }
   return competition
+}
+
+export async function deleteCompetition (uuid: string) {
+  const logger = await getLogger()
+
+  let client
+  try {
+    client = await getClient()
+    logger.info(`deleting competition with uuid=["${uuid}"]`)
+    await client.run(`DELETE FROM "competitions" WHERE uuid = ?`, uuid)
+  } catch (error) {
+    throw new Error(`Failed to delete competition: ${error}`);
+  } finally {
+    await releaseClient(client)
+  }
 }
 
 export async function createEmailAccount (config: EmailAccount) {

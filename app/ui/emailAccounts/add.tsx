@@ -24,6 +24,7 @@ import {
   Typography
 } from '@mui/material'
 import {
+  ArrowBackRounded,
   SaveAsRounded,
   VisibilityOffRounded,
   VisibilityRounded
@@ -94,6 +95,13 @@ export default function AddAccount () {
   return (
     <form action={formAction}  aria-describedby='form-error'>
       <Box className='flex flex-col'>
+        <Box className='m-2'>
+          <Link href='/e' className='block'>
+            <IconButton size='small' aria-label='competition edit' aria-controls='competition-edit-button' aria-haspopup='true' color='inherit'>
+              <ArrowBackRounded color='action' />
+            </IconButton>
+          </Link>
+        </Box>
         <Box className='m-2'>
           <DialogContentText className='pb-5'>Email Account Configuration</DialogContentText>
         </Box>

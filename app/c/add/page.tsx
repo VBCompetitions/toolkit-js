@@ -12,9 +12,8 @@ export default function Page() {
         <Heading heading={'Add Competition'} />
       </Box>
       <Box className='flex flex-col grow justify-center items-center'>
+        <AddCompetition />
         <Box className='flex grow'></Box>
-          <AddCompetition />
-        <Box className='flex grow-[2]'></Box>
       </Box>
     </>
   )

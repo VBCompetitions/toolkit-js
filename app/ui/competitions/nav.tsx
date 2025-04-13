@@ -4,6 +4,9 @@ import Link from 'next/link';
 import clsx from 'clsx'
 import { usePathname } from 'next/navigation'
 import {
+  Box
+} from '@mui/material'
+import {
   ArrowBackRounded,
   DashboardRounded,
   EmailRounded,
@@ -24,8 +27,8 @@ export default function CompetitionNav(
   ]
 
   return (
-    <div className="flex h-full flex-col px-3 py-4 md:px-2">
-      <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
+    <Box className="flex h-full flex-col px-3 py-4 md:px-2">
+      <Box className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">
         {links.map((link) => {
           const LinkIcon = link.icon;
           return (
@@ -44,8 +47,8 @@ export default function CompetitionNav(
             </Link>
           );
         })}
-        <div className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></div>
-      </div>
-    </div>
+        <Box className="hidden h-auto w-full grow rounded-md bg-gray-50 md:block"></Box>
+      </Box>
+    </Box>
   );
 }

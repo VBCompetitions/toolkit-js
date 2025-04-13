@@ -35,7 +35,7 @@ export default function TestAccount (
               <Input id='uuid' name='uuid' disableUnderline={true} type='hidden' value={uuid} />
             </FormControl>
             <Box className='m-2'>
-              <TextField id='email' name='email' label='To address' defaultValue={state.email} className='w-full md:w-[500px]' variant='outlined' />
+              <TextField id='email' name='email' label='To address' defaultValue={state.email} className='w-full md:w-[480px]' variant='outlined' />
             </Box>
             <Box className='m-2' id='status-error' aria-live='polite' aria-atomic='true'>
               {

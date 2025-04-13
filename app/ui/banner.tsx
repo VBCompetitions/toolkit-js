@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { JSX, useState } from 'react'
 import {
   AppBar,
   Box,
@@ -14,32 +14,62 @@ import {
   Typography
 } from '@mui/material'
 import {
-  AccountCircleRounded,
   HomeRounded,
   LogoutRounded,
-  MailOutlineRounded,
-  Menu as MenuIcon,
-  PeopleOutlineRounded,
-  SettingsRounded,
-  SportsVolleyballRounded
+  Menu as MenuIcon
 } from '@mui/icons-material'
-import { logout } from '@/app/lib/actions/user'
+import { logout } from '@/app/lib/actions/auth'
+
 
 // import packageJson from '../package.json';
 
-export default function Banner() {
+export default function Banner(
+  { menuActions, username }:
+  {
+    menuActions: any [],
+    username: string | null | undefined
+  }
+) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  // const session = await auth()
 
   const userInfo = {
     loggedIn: true
   }
-  const openUserMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const openHamburger = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }
 
-  const closeUserMenu = () => {
+  const closeHamburger = () => {
     setAnchorEl(null)
   }
+
+  const menuItems = menuActions.map(action => (
+    <Link key={action.key} href={action.link}>
+      <MenuItem onClick={closeHamburger}>
+        <ListItemIcon>
+          {action.icon}
+        </ListItemIcon>
+        <ListItemText>{action.title}</ListItemText>
+      </MenuItem>
+    </Link>
+  ))
+
+  menuItems.push(
+    <form key='logout' action={async () => {
+        console.log('logging out in the Banner')
+        await logout()
+      }}>
+      <button>
+        <MenuItem onClick={closeHamburger}>
+          <ListItemIcon>
+            <LogoutRounded fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Log out</ListItemText>
+        </MenuItem>
+      </button>
+    </form>
+  )
 
   return (
     <>
@@ -54,13 +84,14 @@ export default function Banner() {
           <Typography className='grow text-center' variant='h6' component='div'>
             VBC Toolkit
           </Typography>
-          <Box>
+          <Box className='flex items-center'>
             {
-              userInfo.loggedIn
+              username
               ?
               <>
+                <Typography className='pr-2' variant='body1' component='span'>{username}</Typography>
                 <IconButton size='large' aria-label='account of current user' aria-controls='menu-appbar'
-                  aria-haspopup='true' onClick={openUserMenu} color='inherit'>
+                  aria-haspopup='true' onClick={openHamburger} color='inherit'>
                   <MenuIcon />
                 </IconButton>
               </>
@@ -69,64 +100,8 @@ export default function Banner() {
             }
             <Menu id='menu-appbar' anchorEl={anchorEl} anchorOrigin={{ vertical: 'top', horizontal: 'right', }}
               keepMounted transformOrigin={{ vertical: 'top', horizontal: 'right', }}
-              open={Boolean(anchorEl)} onClose={closeUserMenu}>
-              {
-                [
-                  <Link key='competitions' href='/c'>
-                    <MenuItem onClick={closeUserMenu}>
-                      <ListItemIcon>
-                        <SportsVolleyballRounded fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Competitions</ListItemText>
-                    </MenuItem>
-                  </Link>,
-                  <Link key='email-accounts' href='/e'>
-                    <MenuItem onClick={closeUserMenu}>
-                      <ListItemIcon>
-                        <MailOutlineRounded fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Email Accounts</ListItemText>
-                    </MenuItem>
-                  </Link>,
-                  <Link key='users' href='/admin/users'>
-                    <MenuItem onClick={closeUserMenu}>
-                      <ListItemIcon>
-                        <PeopleOutlineRounded fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Users</ListItemText>
-                    </MenuItem>
-                  </Link>,
-                    <Link key='settings' href='/admin/settings'>
-                    <MenuItem onClick={closeUserMenu}>
-                      <ListItemIcon>
-                        <SettingsRounded fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Settings</ListItemText>
-                    </MenuItem>
-                  </Link>,
-                  <Link key='account' href='/account'>
-                    <MenuItem onClick={closeUserMenu}>
-                      <ListItemIcon>
-                        <AccountCircleRounded fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText>Account</ListItemText>
-                    </MenuItem>
-                  </Link>,
-                  <form key='logout' action={async () => {
-                      console.log('logging out in the Banner')
-                      await logout()
-                    }}>
-                    <button>
-                      <MenuItem onClick={closeUserMenu}>
-                        <ListItemIcon>
-                          <LogoutRounded fontSize="small" />
-                        </ListItemIcon>
-                        <ListItemText>Log out</ListItemText>
-                      </MenuItem>
-                    </button>
-                  </form>
-                ]
-              }
+              open={Boolean(anchorEl)} onClose={closeHamburger}>
+              {menuItems}
             </Menu>
           </Box>
         </Toolbar>
@@ -134,3 +109,4 @@ export default function Banner() {
     </>
   )
 }
+

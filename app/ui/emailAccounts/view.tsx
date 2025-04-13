@@ -1,7 +1,12 @@
+import Link from 'next/link';
 import {
   Box,
+  Button,
   Typography
 } from '@mui/material'
+import {
+  EditRounded
+} from '@mui/icons-material'
 
 import { EmailAccount } from '@/app/lib/definitions'
 
@@ -13,6 +18,11 @@ export default function ViewAccount (
 
   return (
     <Box className='flex flex-col'>
+      <Box className='text-left pl-2'>
+        <Link href={`/e/${emailAccount.uuid}/update`}>
+          <Button aria-label="Edit email" variant="outlined" startIcon={<EditRounded />} >Edit</Button>
+        </Link>
+      </Box>
       <Box className='m-2'>
         <Box className='mr-2 inline'>
           <Typography className='text-left text-blue-500 m-2' variant='h6' component='span'>Account name:</Typography>

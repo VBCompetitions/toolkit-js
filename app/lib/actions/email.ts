@@ -7,38 +7,14 @@ import { v4 as uuidv4 } from 'uuid'
 import { signIn, signOut } from '@/auth'
 import { AuthError } from 'next-auth'
 import {
-  createCompetition,
   createEmailAccount,
-  updateEmailAccount as updateEmail
+  updateEmailAccount as updateEmail,
+  deleteEmailAccount as deleteEmail
 } from '@/app/lib/database'
 import {
   sendSMTPEmail
 } from '@/app/lib/email'
 import getLogger from '@/app/lib/logger'
-
-export async function authenticate (
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
-}
-
-export async function logout () {
-  console.log('logging out in actions')
-  await signOut()
-}
 
 const AddEmailAccountFormSchema = z.object({
   accountName: z.string().min(1).max(100),
@@ -65,7 +41,7 @@ export type AddEmailAccountState = {
   message?: string | null
 }
 
-export async function addEmailAccount (prevState: AddEmailAccountState, formData: FormData): Promise<AddEmailAccountState>{
+export async function addEmailAccount (prevState: AddEmailAccountState, formData: FormData): Promise<AddEmailAccountState> {
   const validatedFields = AddEmailAccountFormSchema.safeParse({
     accountName: formData.get('accountName'),
     email: formData.get('email'),
@@ -150,7 +126,7 @@ export type UpdateEmailAccountState = {
   message?: string | null
 }
 
-export async function updateEmailAccount (prevState: UpdateEmailAccountState, formData: FormData): Promise<UpdateEmailAccountState>{
+export async function updateEmailAccount (prevState: UpdateEmailAccountState, formData: FormData): Promise<UpdateEmailAccountState> {
   const validatedFields = UpdateEmailAccountFormSchema.safeParse({
     uuid: formData.get('uuid'),
     accountName: formData.get('accountName'),
@@ -245,7 +221,7 @@ export type TestEmailAccountState = {
   message?: string | null
 }
 
-export async function testEmailAccount (prevState: TestEmailAccountState, formData: FormData): Promise<TestEmailAccountState>{
+export async function testEmailAccount (prevState: TestEmailAccountState, formData: FormData): Promise<TestEmailAccountState> {
   const logger = await getLogger()
 
   const validatedFields = TestEmailAccountFormSchema.safeParse({
@@ -277,5 +253,18 @@ export async function testEmailAccount (prevState: TestEmailAccountState, formDa
       errors: {},
       message: 'Failed to send test email account.  Check the logs for details',
     }
+  }
+}
+
+export async function deleteEmailAccount (uuid: string)  {
+  const logger = await getLogger()
+
+  try {
+    await deleteEmail(uuid)
+  } catch (error) {
+    logger.error(`Failed to delete account with uuid=["${uuid}"] due to: ${error}`)
+  } finally {
+    revalidatePath('/e')
+    redirect('/e')
   }
 }

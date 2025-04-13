@@ -4,16 +4,32 @@ import {
   Typography
 } from '@mui/material'
 import {
+  AccountCircleRounded,
   EmailRounded,
+  PeopleOutlineRounded,
+  SettingsRounded,
   SportsVolleyballRounded
 } from '@mui/icons-material'
+import { auth } from '@/auth'
+import RBAC, { Roles } from '@/app/lib/rbac'
+import { InsufficientRoles } from '@/app/ui/home/insufficientRoles'
 
-export default function HomeNav() {
+export default async function HomeNav() {
+  const session = await auth()
 
   const links = [
     { name: 'Competitions', href: '/c', icon: SportsVolleyballRounded },
     { name: 'Email Accounts', href: '/e', icon: EmailRounded }
   ]
+
+  if (await RBAC.roleCheck(session?.user, Roles.ADMIN)) {
+    links.push(
+      { name: 'Users', href: '/admin/users', icon: PeopleOutlineRounded },
+      { name: 'Settings', href: '/admin/settings', icon: SettingsRounded }
+    )
+  }
+
+  links.push({ name: 'My Account', href: '/account', icon: AccountCircleRounded })
 
   return (
     <Box className='flex h-full flex-col pt-6 pb-3 py-4 md:px-2'>

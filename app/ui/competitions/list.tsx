@@ -18,7 +18,7 @@ export default async function CompetitionList () {
   let newCompetitionButton = null
   // if (Roles.roleCheck(userInfo.roles, Roles.Competition.create)) {
     newCompetitionButton = (
-      <Box textAlign="left" paddingLeft="10px">
+      <Box className='text-left pl-2 pb-2'>
         <Link href='/c/add'>
           <Button aria-label="Add competition" variant="outlined" startIcon={<AddRounded />} >Add Competition</Button>
         </Link>
@@ -29,7 +29,7 @@ export default async function CompetitionList () {
   return (
     <Box className='p-2 flex flex-col grow'>
       {newCompetitionButton}
-      <Box padding="10px">
+      <Box className='p-2'>
         <Grid2 container spacing={2}>
           {competitionList.sort((a, b) => {
             return a.name.localeCompare(b.name)

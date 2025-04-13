@@ -15,7 +15,7 @@ export default async function Layout(
 
   return (
     <Box className='p-1 flex flex-col md:flex-row md:overflow-hidden grow'>
-      <Box className="w-full flex-none md:w-64">
+      <Box className="w-full flex-none md:w-48">
         <CompetitionNav uuid={uuid}/>
       </Box>
       <Box className="flex-grow p-6 md:overflow-y-auto md:p-8">

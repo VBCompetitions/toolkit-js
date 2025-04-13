@@ -26,7 +26,7 @@
 | --------- | -------- | ----------- |
 | uuid      | TEXT     | unique ID for the competition |
 | name      | TEXT     | Name for the competition |
-| type      | TEXT     | How the competition is brought in: `url`|`local` |
+| type      | TEXT     | How the competition is brought in: `url`|`local`|`json` |
 | data      | TEXT     | JSON representation of the competition record (see below) |
 
 ### type = `url`

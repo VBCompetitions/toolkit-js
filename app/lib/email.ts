@@ -27,7 +27,7 @@ export async function sendSMTPEmail (uuid: string, to: string, subject: string, 
   const validatedFields = SMTPEmailConfigSchema.safeParse({
     useTLS: smtpConfig.useTLS,
     hostname: smtpConfig.hostname,
-    port: smtpConfig.port,
+    port: parseInt(smtpConfig.port),
     username: smtpConfig.username,
     password: smtpConfig.password
   })

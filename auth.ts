@@ -25,7 +25,6 @@ export const { auth, signIn, signOut } = NextAuth({
           return {
             id: user.uuid,
             name: user.username,
-            roles: user.roles.split(',')
           }
         }
       }
