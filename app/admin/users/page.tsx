@@ -10,7 +10,7 @@ import { InsufficientRoles } from '@/app/ui/home/insufficientRoles'
 export default async function Page() {
   const session = await auth()
 
-  if (!await RBAC.roleCheck(session?.user, Roles.ADMIN)) {
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
     return (
       <InsufficientRoles />
     )

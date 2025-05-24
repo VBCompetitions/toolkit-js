@@ -31,6 +31,7 @@ export default function ActivateUser (
   { user: UserRecord}
 ) {
   const initialState: ActivateUserState = { message: null, errors: {} }
+  // eslint-disable-next-line
   const [state, formAction] = useActionState(activateUser, initialState)
 
   const [showPassword, setShowPassword] = useState(false)

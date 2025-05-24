@@ -7,19 +7,20 @@ import {
 } from '@/app/lib/database'
 import { SMTPEmailConfigSchema } from '@/app/lib/definitions'
 import SMTPConnection from 'nodemailer/lib/smtp-transport'
+import { Session } from 'next-auth'
 
-export async function sendSMTPEmail (uuid: string, to: string, subject: string, body: string) {
+export async function sendSMTPEmail (uuid: string, to: string, subject: string, body: string, session: Session) {
   const logger = await getLogger()
-  logger.info(`Sending email to [${to}] using account with UUID=[${uuid}]`)
+  logger.info(`Sending email to [${to}] using account with UUID=[${uuid}]`, session)
 
   let emailAccount
   try {
-    emailAccount = await getEmailAccountByUUID(uuid)
+    emailAccount = await getEmailAccountByUUID(uuid, session)
     if (!emailAccount) {
       throw new Error('Email Account not found')
     }
   } catch (error) {
-    logger.error(`Failed to get account with UUID=[${uuid}]: ${error}`)
+    logger.error(`Failed to get account with UUID=[${uuid}]: ${error}`, session)
     throw error
   }
 
@@ -33,7 +34,7 @@ export async function sendSMTPEmail (uuid: string, to: string, subject: string, 
   })
 
   if (!validatedFields.success) {
-    logger.error(`SMTP config in account with UUID=[${uuid}] is not valid: ${JSON.stringify(validatedFields.error.flatten().fieldErrors)}`)
+    logger.error(`SMTP config in account with UUID=[${uuid}] is not valid: ${JSON.stringify(validatedFields.error.flatten().fieldErrors)}`, session)
     throw new Error(JSON.stringify(validatedFields.error.flatten().fieldErrors))
   }
 
@@ -62,15 +63,15 @@ export async function sendSMTPEmail (uuid: string, to: string, subject: string, 
   try {
     await transport.sendMail(mail)
   } catch (error) {
-    logger.error(`Error sending email: ${error}`)
+    logger.error(`Error sending email: ${error}`, session)
     throw error
   }
 
   try {
-    await recordEmailSent(uuid)
+    await recordEmailSent(uuid, session)
   } catch (error) {
-    logger.error(`Error recording email account being used: ${error}`)
+    logger.error(`Error recording email account being used: ${error}`, session)
   }
 
-  logger.info(`Email sent: from=[${emailAccount.email}] to=[${to}], subject=[${subject}], body=[${body}]`)
+  logger.info(`Email sent: from=[${emailAccount.email}] to=[${to}], subject=[${subject}], body=[${body}]`, session)
 }

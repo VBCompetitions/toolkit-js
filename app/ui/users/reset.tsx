@@ -6,36 +6,36 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogTitle from '@mui/material/DialogTitle'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
-import { deleteUser as actionDeleteUser } from '@/app/lib/actions/users'
+import { resetUser as actionResetUser } from '@/app/lib/actions/users'
 import type { UserRecord } from '@/app/lib/definitions'
 
-function DeleteUser (
+function ResetUser (
   { user, closeDialog } :
   {
     user: UserRecord,
     closeDialog: () => void
   }
 ) {
-  const deleteUser = () => {
+  const resetUser = () => {
     closeDialog()
-    actionDeleteUser(user.uuid)
+    actionResetUser(user.uuid)
   }
 
   return (
-    <Dialog open={true} onClose={closeDialog} aria-labelledby="delete user">
-      <DialogTitle id="delete-user-dialog-title">Delete user</DialogTitle>
+    <Dialog open={true} onClose={closeDialog} aria-labelledby="reset user">
+      <DialogTitle id="reset-user-dialog-title">Reset user</DialogTitle>
       <DialogContent>
-        <DialogContentText>Are you sure you want to delete the user?</DialogContentText>
+        <DialogContentText>Are you sure you want to reset the user?</DialogContentText>
         <DialogContentText>Username: {user.username}</DialogContentText>
       </DialogContent>
       <DialogActions>
         <Button onClick={closeDialog} variant="outlined" color="primary">Cancel</Button>
-        <form action={deleteUser}>
-          <Button type='submit' variant="contained" color="primary">Delete</Button>
+        <form action={resetUser}>
+          <Button type='submit' variant="contained" color="primary">Reset</Button>
         </form>
       </DialogActions>
     </Dialog>
   )
 }
 
-export default DeleteUser
+export default ResetUser

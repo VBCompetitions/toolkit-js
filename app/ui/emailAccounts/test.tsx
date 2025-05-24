@@ -37,6 +37,9 @@ export default function TestAccount (
             <Box className='m-2'>
               <TextField id='email' name='email' label='To address' defaultValue={state.email} className='w-full md:w-[480px]' variant='outlined' />
             </Box>
+            <Box className='mt-2 flex justify-end gap-4'>
+              <Tooltip title='Send test email'><Button type='submit' variant='contained' startIcon={<SendRounded />} color='primary'>Send</Button></Tooltip>
+            </Box>
             <Box className='m-2' id='status-error' aria-live='polite' aria-atomic='true'>
               {
                 state.errors
@@ -45,9 +48,6 @@ export default function TestAccount (
                 :
                 <Typography className='text-blue-500'>{state.message}</Typography>
               }
-            </Box>
-            <Box className='mt-2 flex justify-end gap-4'>
-              <Tooltip title='Send test email'><Button type='submit' variant='contained' startIcon={<SendRounded />} color='primary'>Send</Button></Tooltip>
             </Box>
           </Box>
         </form>

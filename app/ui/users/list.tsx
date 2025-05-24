@@ -17,12 +17,30 @@ import {
 
 import { getUsers } from '@/app/lib/database'
 import UserRow from './userRow'
+import RBAC, { Roles } from '@/app/lib/rbac'
+import { auth } from '@/auth'
+import { InsufficientRoles } from '../home/insufficientRoles'
 
 export default async function UserList () {
-  const userList = await getUsers()
+  const session = await auth()
+
+  if (!session) {
+    // TODO, this should force a logout
+    return (
+      <InsufficientRoles />
+    )
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    return (
+      <InsufficientRoles />
+    )
+  }
+
+  const userList = await getUsers(session)
 
   let newUserButton = null
-  // // if (Roles.roleCheck(userInfo.roles, Roles.Competition.create)) {
+  // // if (Roles.roleCheck(userInfo.roles, [Roles.Competition.create])) {
     newUserButton = (
       <Box className='text-left pl-2 pb-2'>
         <Link href='/admin/users/add'>

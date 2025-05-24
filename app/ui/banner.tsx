@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { JSX, useState } from 'react'
+import { useState } from 'react'
 import {
   AppBar,
   Box,
@@ -19,6 +19,7 @@ import {
   Menu as MenuIcon
 } from '@mui/icons-material'
 import { logout } from '@/app/lib/actions/auth'
+import { MenuAction } from '@/app/lib/definitions'
 
 
 // import packageJson from '../package.json';
@@ -26,16 +27,12 @@ import { logout } from '@/app/lib/actions/auth'
 export default function Banner(
   { menuActions, username }:
   {
-    menuActions: any [],
+    menuActions: MenuAction [],
     username: string | null | undefined
   }
 ) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  // const session = await auth()
 
-  const userInfo = {
-    loggedIn: true
-  }
   const openHamburger = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget)
   }

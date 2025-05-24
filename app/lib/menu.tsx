@@ -24,7 +24,7 @@ export default async function getMenuActions (session: Session | null) {
     }
   ]
 
-  if (await RBAC.roleCheck(session?.user, Roles.ADMIN)) {
+  if (await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
     menuActions.push(
       {
         key: 'users',

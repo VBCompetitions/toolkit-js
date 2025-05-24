@@ -12,17 +12,16 @@ import {
 } from '@mui/icons-material'
 import { auth } from '@/auth'
 import RBAC, { Roles } from '@/app/lib/rbac'
-import { InsufficientRoles } from '@/app/ui/home/insufficientRoles'
 
 export default async function HomeNav() {
   const session = await auth()
-
   const links = [
+
     { name: 'Competitions', href: '/c', icon: SportsVolleyballRounded },
     { name: 'Email Accounts', href: '/e', icon: EmailRounded }
   ]
 
-  if (await RBAC.roleCheck(session?.user, Roles.ADMIN)) {
+  if (await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
     links.push(
       { name: 'Users', href: '/admin/users', icon: PeopleOutlineRounded },
       { name: 'Settings', href: '/admin/settings', icon: SettingsRounded }

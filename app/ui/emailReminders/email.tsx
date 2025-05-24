@@ -8,17 +8,35 @@ import {
   // SelectChangeEvent,
   Switch
 } from '@mui/material'
-import { EmailAccount } from '@/app/lib/definitions'
+import { EmailAccountMetadata } from '@/app/lib/definitions'
 import SelectAccount from '@/app/ui/emailReminders/select-account'
+import RBAC, { Roles } from '@/app/lib/rbac'
+import { auth } from '@/auth'
+import { InsufficientRoles } from '../home/insufficientRoles'
 
 export default async function Email (
   { uuid, emailAccounts }:
   {
     uuid: string,
-    emailAccounts: Array<EmailAccount>
+    emailAccounts: Array<EmailAccountMetadata>
   }
 ) {
-  const competition = await getCompetitionByUUID(uuid)
+  const session = await auth()
+
+  if (!session) {
+    // TODO, this should force a logout
+    return (
+      <InsufficientRoles />
+    )
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    return (
+      <InsufficientRoles />
+    )
+  }
+
+  const competition = await getCompetitionByUUID(uuid, session)
   if (!competition) {
     notFound()
   }

@@ -6,12 +6,19 @@ import Heading from '@/app/ui/heading'
 import {
   Box
 } from '@mui/material'
+import { auth } from '@/auth'
 
 export default async function Page(props: { params: Promise<{ uuid: string }> }) {
   const params = await props.params;
   const uuid = params.uuid
+  const session = await auth()
 
-  const user = await getUserByUUID(uuid)
+  if (!session) {
+    // TODO, this should force a logout
+    return
+  }
+
+  const user = await getUserByUUID(uuid, session)
   if (!user) {
     notFound()
   }

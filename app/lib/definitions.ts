@@ -1,3 +1,4 @@
+import { JSX } from 'react'
 import { z } from 'zod'
 
 export type LogLevel = 'trace'|'debug'|'info'|'warn'|'error'|'fatal'
@@ -96,3 +97,10 @@ export const SMTPEmailConfigSchema = z.object({
   username: z.string(),
   password: z.string()
 })
+
+export type MenuAction = {
+  key: string,
+  link: string,
+  title: string,
+  icon: JSX.Element
+}

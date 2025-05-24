@@ -1,6 +1,6 @@
 'use server'
 
-import { signIn, signOut } from '@/auth'
+import { auth, signIn, signOut } from '@/auth'
 import { AuthError } from 'next-auth'
 import getLogger from '@/app/lib/logger'
 
@@ -9,7 +9,7 @@ export async function authenticate (
   formData: FormData,
 ) {
   const logger = await getLogger()
-  logger.info('logging in')
+  logger.info('User logging in')
 
   try {
     await signIn('credentials', formData);
@@ -28,6 +28,8 @@ export async function authenticate (
 
 export async function logout () {
   const logger = await getLogger()
-  logger.info('logging out')
+  const session = await auth()
+
+  logger.info('User logging out', session)
   await signOut()
 }

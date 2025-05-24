@@ -8,13 +8,13 @@ import {
   Select,
   SelectChangeEvent,
 } from '@mui/material'
-import { EmailAccount } from '@/app/lib/definitions'
+import { EmailAccountMetadata } from '@/app/lib/definitions'
 
 export default function SelectAccount (
   { emailAccounts }:
-  { emailAccounts: Array<EmailAccount> }
+  { emailAccounts: Array<EmailAccountMetadata> }
 ) {
-  const [account, setAccount] = useState<EmailAccount|undefined>()
+  const [account, setAccount] = useState<EmailAccountMetadata|undefined>()
 
   function changeAccount (e: SelectChangeEvent<string>) {
     setAccount(emailAccounts.find(el => el.name === e.target.value))

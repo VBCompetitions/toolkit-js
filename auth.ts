@@ -3,7 +3,7 @@ import Credentials from 'next-auth/providers/credentials'
 import NextAuth from 'next-auth'
 import { z } from 'zod'
 import { authConfig } from  './auth.config'
-import { getUserByUsername } from '@/app/lib/database'
+import { getUserForLogin } from '@/app/lib/database'
 
 export const { auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -15,7 +15,7 @@ export const { auth, signIn, signOut } = NextAuth({
 
       if (parsedCredentials.success) {
         const { username, password } = parsedCredentials.data
-        const user = await getUserByUsername(username)
+        const user = await getUserForLogin(username)
         if (!user) return null
         if(user.state === 'suspended') return null
 

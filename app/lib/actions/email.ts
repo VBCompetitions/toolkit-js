@@ -4,8 +4,7 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { v4 as uuidv4 } from 'uuid'
-import { signIn, signOut } from '@/auth'
-import { AuthError } from 'next-auth'
+import { auth } from '@/auth'
 import {
   createEmailAccount,
   updateEmailAccount as updateEmail,
@@ -15,6 +14,7 @@ import {
   sendSMTPEmail
 } from '@/app/lib/email'
 import getLogger from '@/app/lib/logger'
+import RBAC, { Roles } from '@/app/lib/rbac'
 
 const AddEmailAccountFormSchema = z.object({
   accountName: z.string().min(1).max(100),
@@ -26,6 +26,12 @@ const AddEmailAccountFormSchema = z.object({
   username: z.string(),
   password: z.string(),
 })
+
+class AddEmailAccountnError extends Error {
+  constructor (public errors: object, message: string) {
+    super(message)
+  }
+}
 
 export type AddEmailAccountState = {
   errors?: {
@@ -42,6 +48,24 @@ export type AddEmailAccountState = {
 }
 
 export async function addEmailAccount (prevState: AddEmailAccountState, formData: FormData): Promise<AddEmailAccountState> {
+  const logger = await getLogger()
+  const session = await auth()
+
+  if (!session) {
+    logger.error('attempting to add an email account failed due to missing session')
+    throw new AddEmailAccountnError({}, 'Missing session')
+  }
+
+  if (!await RBAC.activeCheck(session?.user)) {
+    logger.error('attempting to add an email account failed due to user suspension', session)
+    throw new AddEmailAccountnError({}, 'User Suspended')
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    logger.error('attempting to add an email account failed due to insufficient permissions', session)
+    throw new AddEmailAccountnError({}, 'Insufficient permissions')
+  }
+
   const validatedFields = AddEmailAccountFormSchema.safeParse({
     accountName: formData.get('accountName'),
     email: formData.get('email'),
@@ -72,7 +96,7 @@ export async function addEmailAccount (prevState: AddEmailAccountState, formData
         lastUse: 0,
         type,
         data: JSON.stringify(data)
-      })
+      }, session)
     } catch (err) {
       return {
         message: `Database Error: Failed to add email account: ${err}`
@@ -127,6 +151,24 @@ export type UpdateEmailAccountState = {
 }
 
 export async function updateEmailAccount (prevState: UpdateEmailAccountState, formData: FormData): Promise<UpdateEmailAccountState> {
+  const logger = await getLogger()
+  const session = await auth()
+
+  if (!session) {
+    logger.error('attempting to update an email account failed due to missing session')
+    throw new AddEmailAccountnError({}, 'Missing session')
+  }
+
+  if (!await RBAC.activeCheck(session?.user)) {
+    logger.error('attempting to update an email account failed due to user suspension', session)
+    throw new AddEmailAccountnError({}, 'User Suspended')
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    logger.error('attempting to update an email account failed due to insufficient permissions', session)
+    throw new AddEmailAccountnError({}, 'Insufficient permissions')
+  }
+
   const validatedFields = UpdateEmailAccountFormSchema.safeParse({
     uuid: formData.get('uuid'),
     accountName: formData.get('accountName'),
@@ -169,7 +211,7 @@ export async function updateEmailAccount (prevState: UpdateEmailAccountState, fo
         type,
         lastUse: 0,
         data: JSON.stringify(data)
-      })
+      }, session)
     } catch (err) {
       return {
         settings: {
@@ -223,6 +265,22 @@ export type TestEmailAccountState = {
 
 export async function testEmailAccount (prevState: TestEmailAccountState, formData: FormData): Promise<TestEmailAccountState> {
   const logger = await getLogger()
+  const session = await auth()
+
+  if (!session) {
+    logger.error('attempting to test an email account failed due to missing session')
+    throw new AddEmailAccountnError({}, 'Missing session')
+  }
+
+  if (!await RBAC.activeCheck(session?.user)) {
+    logger.error('attempting to test an email account failed due to user suspension', session)
+    throw new AddEmailAccountnError({}, 'User Suspended')
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    logger.error('attempting to test an email account failed due to insufficient permissions', session)
+    throw new AddEmailAccountnError({}, 'Insufficient permissions')
+  }
 
   const validatedFields = TestEmailAccountFormSchema.safeParse({
     uuid: formData.get('uuid'),
@@ -240,14 +298,14 @@ export async function testEmailAccount (prevState: TestEmailAccountState, formDa
   const { uuid, email } = validatedFields.data
 
   try {
-    logger.info(`sending test email to ${email}`)
-    await sendSMTPEmail(uuid, email, 'Test from VBC Toolkit', 'This is a test email from VBC Toolkit')
+    logger.info(`sending test email to ${email}`, session)
+    await sendSMTPEmail(uuid, email, 'Test from VBC Toolkit', 'This is a test email from VBC Toolkit', session)
     return {
       email: formData.get('email')?.toString() || '',
       message: `Test email sent`
     }
   } catch (error) {
-    logger.error(`failed to send test email: ${error}`)
+    logger.error(`failed to send test email: ${error}`, session)
     return {
       email: formData.get('email')?.toString() || '',
       errors: {},
@@ -258,11 +316,27 @@ export async function testEmailAccount (prevState: TestEmailAccountState, formDa
 
 export async function deleteEmailAccount (uuid: string)  {
   const logger = await getLogger()
+  const session = await auth()
+
+  if (!session) {
+    logger.error('attempting to delete an email account failed due to missing session')
+    throw new AddEmailAccountnError({}, 'Missing session')
+  }
+
+  if (!await RBAC.activeCheck(session?.user)) {
+    logger.error('attempting to delete an email account failed due to user suspension', session)
+    throw new AddEmailAccountnError({}, 'User Suspended')
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
+    logger.error('attempting to delete an email account failed due to insufficient permissions', session)
+    throw new AddEmailAccountnError({}, 'Insufficient permissions')
+  }
 
   try {
-    await deleteEmail(uuid)
+    await deleteEmail(uuid, session)
   } catch (error) {
-    logger.error(`Failed to delete account with uuid=["${uuid}"] due to: ${error}`)
+    logger.error(`Failed to delete account with uuid=[${uuid}] due to: ${error}`, session)
   } finally {
     revalidatePath('/e')
     redirect('/e')

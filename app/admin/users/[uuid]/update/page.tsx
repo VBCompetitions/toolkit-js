@@ -13,7 +13,14 @@ import { InsufficientRoles } from '@/app/ui/home/insufficientRoles'
 export default async function Page(props: { params: Promise<{ uuid: string }> }) {
   const session = await auth()
 
-  if (!await RBAC.roleCheck(session?.user, Roles.ADMIN)) {
+  if (!session) {
+    // TODO, this should force a logout
+    return (
+      <InsufficientRoles />
+    )
+  }
+
+  if (!await RBAC.roleCheck(session?.user, [Roles.ADMIN])) {
     return (
       <InsufficientRoles />
     )
@@ -22,7 +29,7 @@ export default async function Page(props: { params: Promise<{ uuid: string }> })
   const params = await props.params;
   const uuid = params.uuid
 
-  const user = await getUserByUUID(uuid)
+  const user = await getUserByUUID(uuid, session)
   if (!user) {
     notFound()
   }
